@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urine strip reader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="status" id="status"><i></i><span id="status-text">Not connected</span></div>
+    <div class="top-actions">
+      <button id="connect" class="primary">Connect Arduino</button>
+      <button id="disconnect" hidden>Disconnect</button>
+    </div>
+  </header>
+
+  <div id="unsupported" class="banner" hidden>
+    This browser can't talk to an Arduino. Open this page in <b>Google Chrome</b> or <b>Microsoft Edge</b> on a computer.
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button data-tab="scan" class="active">Scan</button>
+    <button data-tab="teach">Teach colours</button>
+    <button data-tab="setup">Setup &amp; firmware</button>
+  </nav>
+
+  <main>
+    <!-- SCAN: calibrate once, then 5 scans, then Complete -->
+    <section id="tab-scan" class="tab">
+      <div class="grid">
+        <div class="panel">
+          <h2>Sensor right now</h2>
+          <div class="live">
+            <div class="swatch big" id="live-swatch"></div>
+            <div class="counts">
+              <div class="count r"><span>RED</span><b id="live-r">-</b></div>
+              <div class="count g"><span>GREEN</span><b id="live-g">-</b></div>
+              <div class="count b"><span>BLUE</span><b id="live-b">-</b></div>
+              <div class="count c"><span>CLEAR</span><b id="live-c">-</b></div>
+            </div>
+          </div>
+          <div class="led-row">
+            <span>Sensor LED</span>
+            <button id="led" class="switch" aria-pressed="false" title="Turn the white LED beside the sensor on or off">
+              <i></i><span id="led-text">Off</span>
+            </button>
+          </div>
+          <h3>White card calibration</h3>
+          <p class="hint">Put the white card in front of the sensor, close the box, then click Calibrate.
+            Do this each time you start, or after moving the sensor.</p>
+          <p class="hint" id="cal-text">Not calibrated yet.</p>
+          <button id="calibrate">Calibrate</button>
+        </div>
+
+        <div class="panel">
+          <h2>This strip <span class="pill" id="scan-count">0 of 5 scans</span></h2>
+          <p class="hint">Place one pad in front of the sensor and press Scan. The app reads it 5 times
+            over 5 seconds, averages the readings, and works out which parameter it is by itself.</p>
+          <div class="actions">
+            <button id="scan" class="primary big">Scan</button>
+            <button id="complete" class="go big">Complete &amp; get PDF</button>
+            <button id="new-session">Start over</button>
+          </div>
+          <div class="progress" id="progress" hidden><div class="bar"><i id="progress-bar"></i></div><span id="progress-text"></span></div>
+          <p class="message" id="message" role="status"></p>
+          <ol class="results" id="results"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEACH: which parameters to look for, and their reference colours -->
+    <section id="tab-teach" class="tab" hidden>
+      <div class="panel">
+        <h2>Which parameters should the app look for?</h2>
+        <p class="hint">Five is a good number. Pick pads whose colours don't look alike, and check the
+          look-alike list below.</p>
+        <div class="chips" id="param-list"></div>
+      </div>
+      <div class="panel">
+        <h2>Look-alike check</h2>
+        <p class="hint">Pairs of reference colours from <i>different</i> parameters that are close enough to be mixed up.
+          A "difference" under 12 is a risk. If a pair shows up here, the app will ask you to choose when it sees that colour.</p>
+        <ul class="clashes" id="clash-list"></ul>
+      </div>
+      <div class="panel">
+        <h2>Reference colours</h2>
+        <p class="hint">"Placeholder" colours are rough copies of a typical strip chart, so you can try the app straight away.
+          For real use, dip a strip in a sample whose level you know, wait the reading time printed on the bottle,
+          put that pad in front of the sensor and click <b>Record</b> on the matching row. Needs a connected, calibrated Arduino.</p>
+        <div class="progress" id="teach-progress" hidden><div class="bar"><i></i></div><span></span></div>
+        <p class="message" id="teach-message" role="status"></p>
+        <div id="ref-table"></div>
+        <div class="actions">
+          <button id="export-json">Save backup file</button>
+          <button id="import-json">Load backup file</button>
+          <input type="file" id="import-file" accept=".json,application/json" hidden>
+          <button id="export-default">Export as built-in default</button>
+          <button id="reset-refs" class="danger">Reset to placeholders</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP: wiring and the firmware installer -->
+    <section id="tab-setup" class="tab" hidden>
+      <div class="panel">
+        <h2>1. Wire the sensor</h2>
+        <p class="hint">Waveshare TCS34725 colour sensor to an Arduino Uno, five wires:</p>
+        <table class="wiring">
+          <tr><th>Sensor pin</th><td>VCC</td><td>GND</td><td>SDA</td><td>SCL</td><td>LED</td></tr>
+          <tr><th>Arduino pin</th><td>5V</td><td>GND</td><td>A4</td><td>A5</td><td>D6</td></tr>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>2. Install the firmware</h2>
+        <p class="hint">"Firmware" is the small program that runs on the Arduino and reads the sensor.
+          You only need to do this once per board. Plug the Arduino in with its USB cable, close Arduino IDE if it's open,
+          then click the button and pick your board from the list.</p>
+        <div class="actions">
+          <button id="install" class="primary">Install firmware</button>
+          <button id="install-any" class="link">My board isn't in the list</button>
+        </div>
+        <div class="progress" id="install-progress" hidden><div class="bar"><i id="install-bar"></i></div><span id="install-text"></span></div>
+        <pre class="log" id="install-log" hidden></pre>
+      </div>
+      <div class="panel">
+        <h2>3. Calibrate and scan</h2>
+        <p class="hint">Go back to the Scan tab, calibrate with the white card, and start scanning.
+          Next time, the Arduino connects by itself as soon as you open the app and plug it in.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>This app is an educational prototype, not a medical device. Confirm any result with a laboratory test.</footer>
+
+  <script src="js/references.js"></script>
+  <script src="js/reference-data.js"></script>
+  <script src="js/colour.js"></script>
+  <script src="js/firmware-hex.js"></script>
+  <script src="js/stk500.js"></script>
+  <script src="js/serial.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
