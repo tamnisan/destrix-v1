@@ -48,7 +48,8 @@
       box(0, 0, 595, 92, [0.09, 0.19, 0.24]);
       text('URINE TEST STRIP', 36, 37, 22, true, [1, 1, 1]);
       text(title, 36, 61, 12, false, [1, 1, 1]);
-      text('EDUCATIONAL PROTOTYPE - NOT A MEDICAL DIAGNOSIS', 36, 80, 9, true, [0.75, 0.9, 0.85]);
+      text(report.simulated ? 'SIMULATED READINGS - NOT A REAL TEST - NOT A MEDICAL DIAGNOSIS'
+        : 'EDUCATIONAL PROTOTYPE - NOT A MEDICAL DIAGNOSIS', 36, 80, 9, true, [0.75, 0.9, 0.85]);
       text(`${page} / 2`, 527, 43, 9, false, [1, 1, 1]);
     }
     function footer() {

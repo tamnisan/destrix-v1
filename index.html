@@ -23,6 +23,7 @@
     <button data-tab="scan" class="active">Scan</button>
     <button data-tab="teach">Teach colours</button>
     <button data-tab="setup">Setup &amp; firmware</button>
+    <button data-tab="settings">Settings</button>
   </nav>
 
   <main>
@@ -129,6 +130,34 @@
           Next time, the Arduino connects by itself as soon as you open the app and plug it in.</p>
       </div>
     </section>
+
+    <!-- SETTINGS: simulated results -->
+    <section id="tab-settings" class="tab" hidden>
+      <div class="panel">
+        <h2>Simulated results</h2>
+        <p class="hint">When this is on, Scan shows results from 10 built-in test cases instead of what the sensor reads.
+          Connecting, calibrating, the countdown and the 5 readings work the same as usual.
+          The Teach tab always uses the real sensor, and PDF reports made this way are marked as simulated.</p>
+        <div class="led-row">
+          <span>Use simulated results</span>
+          <button id="sim-toggle" class="switch" aria-pressed="false"><i></i><span id="sim-text">Off</span></button>
+        </div>
+        <div class="led-row">
+          <label for="sim-repeat">Each new test uses</label>
+          <select id="sim-repeat">
+            <option value="different">A different case</option>
+            <option value="same">The same case as last time</option>
+          </select>
+        </div>
+        <div class="led-row">
+          <span>Work without the Arduino</span>
+          <button id="no-arduino" class="switch" aria-pressed="false"><i></i><span id="no-arduino-text">Off</span></button>
+        </div>
+        <p class="hint">With this on, the app acts as if an Arduino is connected and ignores any real one. It needs simulated results on.</p>
+        <p class="hint" id="sim-last"></p>
+        <p class="hint">A new test begins with the first scan after you press Start over.</p>
+      </div>
+    </section>
   </main>
 
   <footer>This app is an educational prototype, not a medical device. Confirm any result with a laboratory test.</footer>
@@ -136,6 +165,7 @@
   <script src="js/references.js"></script>
   <script src="js/reference-data.js"></script>
   <script src="js/colour.js"></script>
+  <script src="js/simulation.js"></script>
   <script src="js/firmware-hex.js"></script>
   <script src="js/stk500.js"></script>
   <script src="js/serial.js"></script>
